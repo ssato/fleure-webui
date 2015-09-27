@@ -12,6 +12,7 @@ from __future__ import absolute_import
 
 import flask
 import os.path
+import os
 import werkzeug
 
 import fleure.main
@@ -20,6 +21,13 @@ import fleure.main
 # TBD:
 UPLOAD_FOLDER = '/tmp/uploads'  # TBD
 WORKDIR = '/tmp/workdir'  # TBD
+
+if not os.path.exists(WORKDIR):
+    os.makedirs(WORKDIR)
+
+if not os.path.exists(UPLOAD_FOLDER):
+    os.makedirs(UPLOAD_FOLDER)
+
 ALLOWED_EXTENSIONS = ('.zip', '.tar.xz')
 MAX_CONTENT_LENGTH = 100 * 1024 * 1024  # [MB]
 
@@ -51,7 +59,9 @@ def upload_file():
             file.save(filepath)
 
             # do analysis:
-            fleure.main.main(filepath, app.config["WORKDIR"])
+            cnf = dict(workdir=app.config["WORKDIR"])
+            fleure.main.main(filepath, verbosity=2, **cnf)
+
             return flask.redirect(flask.url_for('fileinfo', filename=filename))
 
     return flask.render_template('upload.html', filename='<not choosen>')
@@ -64,8 +74,13 @@ def fileinfo(filename):
     """
     filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
     filesize = os.path.getsize(filepath) / 1024
+
+    workdir = app.config["WORKDIR"]
+    errata = dict(summary=os.path.join(workdir, "errata_summary.xls"),
+                  details=os.path.join(workdir, "errata_details.xls"))
+
     return flask.render_template('fileinfo.html', filename=filename,
-                                 filesize=filesize)
+                                 filesize=filesize, errata=errata)
 
 
 @app.route('/download/<filename>')
