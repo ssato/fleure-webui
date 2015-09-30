@@ -84,14 +84,12 @@ setup(name=PACKAGE,
       long_description=codecs.open("README.rst", 'r', 'utf-8').read(),
       author="Satoru SATOH",
       author_email="ssato@redhat.com",
-      license="GPLv3+",
+      license="MIT",
       url="https://github.com/ssato/fleure-webui",
       packages=["app"],
       include_package_data=True,
       cmdclass={"srpm": SrpmCommand,
                 "rpm":  RpmCommand},
-      entry_points=open(os.path.join(os.curdir,
-                                     "pkg/entry_points.txt")).read(),
       data_files=data_files)
 
 # vim:sw=4:ts=4:et:
