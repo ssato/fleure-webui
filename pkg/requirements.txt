@@ -1,1 +1,6 @@
 -e git+https://github.com/ssato/fleure.git
+Flask
+Flask-Bootstrap
+Flask-WTF
+Jinja2
+Werkzeug
