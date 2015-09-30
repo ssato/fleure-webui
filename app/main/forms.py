@@ -66,7 +66,8 @@ class AnalysisInfoForm(flask_wtf.Form):
     #         ("rhel6", "RHEL 6"), ("rhel7", "RHEL 7")]
     # dist = wtforms.SelectField("OS Distribution", choices=dists,
     #                           default="auto")
-    repos = wtforms.SelectMultipleField("Yum Repo[s]")
+    _repo_choices = sorted(fleure.globals.REPOS_MAP.values())
+    repos = wtforms.SelectMultipleField("Yum Repo[s]", choices=_repo_choices)
 
     _wds_msg = ("A string of letters (a-zA-Z0-9), or "
                 "strings of letters separated by spaces")
