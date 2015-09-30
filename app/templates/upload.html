@@ -1,7 +1,13 @@
-<!doctype html>
-<title>Upload new File</title>
-<h1>Upload new File</h1>
+{% extends "base.html" -%}
+{% block title %}Fleuere Web UI: File Upload{% endblock -%}
+
+{% block page_content -%}
 <form action="" method="POST" enctype="multipart/form-data">
-  <p><input type="file" name="file"></p>
+  {{ form.hidden_tag() -}}
+  {# or {{ form.csrf_token }} -#}
+  <p><input type="file" name="filename"></p>
   <p><input type="submit" value="Upload"></p>
 </form>
+{%- endblock %}
+{# vim:sw=2:ts=2:et:
+-#}
