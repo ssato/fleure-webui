@@ -45,6 +45,8 @@ def upload():
         resp.headers["Content-Type"] = "application/zip"
         resp.headers["Content-Disposition"] = \
             "attachement; filename=\"%s\";" % arcfile
+
+        flask.session.clear()
         return resp
 
     form = UploadForm()
