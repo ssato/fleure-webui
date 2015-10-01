@@ -11,18 +11,18 @@ import os
 import unittest
 
 import app.main.forms as TT
-from . import common
+import tests.common
 
 
 class TestForms(unittest.TestCase):
 
     def setUp(self):
-        self.workdir = common.setup_workdir()
+        self.workdir = tests.common.setup_workdir()
         self.app = self.create_app()
         self.client = self.app.test_client()
 
     def tearDown(self):
-        common.cleanup_workdir(self.workdir)
+        tests.common.cleanup_workdir(self.workdir)
 
     def create_app(self):
         app = flask.Flask(__name__)
