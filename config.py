@@ -17,6 +17,7 @@ class Config(object):
     """Default configuration
     """
     SECRET_KEY = os.environ.get('SECRET_KEY') or str(uuid.uuid4())
+    WTF_CSRF_ENABLED = True
 
     FLEURE_UPLOAD_FOLDER = "/tmp/uploads"
     FLEURE_WORKDIR = "/tmp/uploads"
