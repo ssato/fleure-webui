@@ -3,6 +3,8 @@
 # Copyright (C) 2015 Satoru SATOH <ssato@redhat.com>
 # License: MIT
 #
+# .. note:: suppress false-positive warnings around werkzeug
+# pylint: disable=no-member
 """Fleure's Web UI
 """
 from __future__ import absolute_import
@@ -34,7 +36,7 @@ def upload():
     form = UploadForm()
     if form.validate_on_submit():
         # ..note::
-        #   filename must be renamed to some unique one to avoid collisions. 
+        #   filename must be renamed to some unique one to avoid collisions.
         filename = werkzeug.secure_filename(form.filename.data.filename)
         filepath = gen_filepath(filename)
         fileabspath = os.path.join(flask.current_app.config["UPLOAD_FOLDER"],
@@ -51,7 +53,7 @@ def upload():
     return render_template("upload.html", form=form, filename=filename)
 
 
-@main.route("/analyze"):
+@main.route("/analyze")
 def start_analysis():
     """Show basic info of uploaded file and start analysis.
     """
