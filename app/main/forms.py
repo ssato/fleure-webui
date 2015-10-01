@@ -18,15 +18,15 @@ import fleure.globals
 
 class FileAllowedEx(flask_wtf.file.FileAllowed):
     """
-    A little bit modified version of flask_wtf.FileAllowed to allow complex
-    file extensions such as .tar.xz, .tar.gz, etc.
+    A little bit modified version of flask_wtf.FileAllowed to allow composite
+    file extensions such like .tar.xz, .tar.gz, etc.
 
     ..seealso:: :class:`~flask_wtf.file.FileAllowed`, etc.
     ..seealso:: https://github.com/lepture/flask-wtf/issues/201
     ..todo:: Write doctest cases
     """
     def __call__(self, form, field):
-        """Modified from parent to allow complex exntesions.
+        """Modified from parent to allow composite extensions.
         """
         if not field.has_file():
             return
