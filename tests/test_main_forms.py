@@ -10,7 +10,7 @@ import os.path
 import os
 import unittest
 
-import app.main.forms as TT
+import fleure_webui.main.forms as TT
 import tests.common
 
 
