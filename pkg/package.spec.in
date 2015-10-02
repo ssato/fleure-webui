@@ -45,12 +45,6 @@ Fleure is a package level static analysis tool for systems running RPM-based
 linux distributions such like RHEL (primary target) and Fedora. And this
 package provides Web UI frontend for fleure.
 
-%package     -n python-%{srcname}-common
-Summary:        %{srcname} common data files
-
-%description -n python-%{srcname}-common
-Common data files of %{srcname}.
-
 %prep
 %setup -q -n %{srcname}-%{version}
 
@@ -69,9 +63,6 @@ Common data files of %{srcname}.
 %files -n python3-%{srcname}
 %doc README.rst
 %{python3_sitelib}/*
-
-%files -n python-%{srcname}-common
-%{_datadir}/%{srcname}/app/templates/*.*
 
 %changelog
 * Sun Sep 27 2015 Satoru SATOH <ssato@redhat.com> - 0.1-1
