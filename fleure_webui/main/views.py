@@ -10,6 +10,7 @@
 from __future__ import absolute_import
 
 import flask
+import hashlib
 import os.path
 import os
 import werkzeug
@@ -17,16 +18,30 @@ import uuid
 
 from flask import render_template
 from . import main
-from .forms import UploadForm, AnalyzeForm
+from .forms import UploadForm, AnalyzeForm, gen_hid
 
 import fleure.main
 
 
-def gen_filepath(filename):
+def _gen_filepath(filename):
     """
     Generate relative file path from filename to avoid filename conflicts.
     """
-    return os.path.join(str(uuid.uuid4()), filename)
+    return os.path.join(gen_hid().split('-')[0], filename)
+
+
+def _listify(objs):
+    """
+    Listify `objs` :: str
+
+    >>> _listify("aaa bbb ccc")
+    ['aaa', 'bbb', 'ccc']
+    >>> _listify("aaa, bbb, ccc")
+    ['aaa', 'bbb', 'ccc']
+    >>> _listify("aaa, bbb, c c c")
+    ['aaa', 'bbb', 'c c c']
+    """
+    return [s.strip() for s in objs.split(',' if ',' in objs else None)]
 
 
 @main.route('/', methods=("GET", "POST"))
@@ -54,13 +69,15 @@ def upload():
         # ..note::
         #   filename must be renamed to some unique one to avoid collisions.
         filename = werkzeug.secure_filename(form.filename.data.filename)
-        filepath = gen_filepath(filename)
+        filepath = _gen_filepath(filename)
+
         uploaddir = flask.current_app.config["FLEURE_UPLOAD_FOLDER"]
         fileabspath = os.path.join(uploaddir, filepath)
         os.makedirs(os.path.dirname(fileabspath))
         form.filename.data.save(fileabspath)
 
         flask.session["filepath"] = filepath
+        flask.session["hostid"] = form.hostid.data
         flask.flash("Uploaded: %s" % filename)
 
         return flask.redirect(flask.url_for(".analyze"))
@@ -76,7 +93,8 @@ def analyze():
     """Show basic info of uploaded file and start analysis.
     """
     filepath = flask.session.get("filepath", None)
-    if filepath is None:
+    hostid = flask.session.get("hostid", None)
+    if filepath is None or hostid is None:
         return flask.redirect(flask.url_for(".upload"))
 
     # Paranoid and unnecessary ? (CSRF issue)
@@ -95,9 +113,11 @@ def analyze():
         workdir = os.path.join(flask.current_app.config["FLEURE_WORKDIR"],
                                os.path.dirname(filepath))
 
-        cnf = dict(workdir=workdir, repos=form.repos.data,
-                   errata_keywords=form.keywords.data,
-                   core_rpms=form.core_rpms.data, archive=True)
+        _kwds = _listify(form.keywords.data)
+        _rpms = _listify(form.core_rpms.data)
+
+        cnf = dict(hid=hostid, workdir=workdir, repos=form.repos.data,
+                   errata_keywords=_kwds, core_rpms=_rpms, archive=True)
 
         # .. note:: Analysis will take some time until its finish:
         arcpath = fleure.main.main(filepath, verbosity=2, **cnf)

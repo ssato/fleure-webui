@@ -10,11 +10,20 @@ from __future__ import absolute_import
 
 import flask_wtf.file
 import flask_wtf
+import uuid
 import wtforms.validators as WV
 import wtforms
 
+from wtforms import StringField
+
 import fleure.globals
 import fleure.utils
+
+
+def gen_hid():
+    """Generate Host ID.
+    """
+    return str(uuid.uuid4())
 
 
 class FileAllowedEx(flask_wtf.file.FileAllowed):
@@ -49,17 +58,23 @@ class FileAllowedEx(flask_wtf.file.FileAllowed):
 class UploadForm(flask_wtf.Form):
     """Form to upload RPM DB archive files.
     """
+    _vrts = [WV.Required(),
+             WV.Regexp(r"^\S+$", 0, "Must consists of non-blank letters")]
+    hostid = StringField("Hostname or Host ID",
+                         description="Enter hostname or any word identify "
+                                     "the target host as needed",
+                         validators=_vrts, default=gen_hid())
+
     _vtrs = [flask_wtf.file.FileRequired(),
              FileAllowedEx(("zip", "tar.xz", "tar.bz2", "tar.gz"),
                            "Archive files only!")]
-
     filename = flask_wtf.file.FileField("archive", validators=_vtrs)
+
     submit = wtforms.SubmitField("Upload")
 
 
-def _make_repo_choices(repos_map=None):
-    """
-    Make up repo choices.
+def _repo_choices(repos_map=None):
+    """Make up repo choices.
     """
     if repos_map is None:
         repos_map = fleure.globals.REPOS_MAP
@@ -78,27 +93,30 @@ class AnalyzeForm(flask_wtf.Form):
     #         ("rhel6", "RHEL 6"), ("rhel7", "RHEL 7")]
     # dist = wtforms.SelectField("OS Distribution", choices=dists,
     #                           default="auto")
-    _repo_choices = _make_repo_choices()
-    repos = wtforms.SelectMultipleField("Yum Repo[s]", choices=_repo_choices)
+    _repos_desc = ("Yum repos to access. Only select some of them explicitly "
+                   "if you know needed yum repos clearly.")
+    repos = wtforms.SelectMultipleField("Yum Repo[s]", description=_repos_desc,
+                                        choices=_repo_choices())
 
     _wvrts = [WV.Required(),
-              WV.Regexp(r"^\w+$",
-                        message="Must be a string of letters (a-zA-Z0-9)")]
+              WV.Regexp(r"^(\w+(?:,?\s+\w+)*)$",
+                        message="Must consists of strings of letters "
+                                "(a-zA-Z0-9), separated with a comma (',')"
+                                "or space")]
 
-    _kwds_default = ' '.join(fleure.globals.ERRATA_KEYWORDS)
-    _kw_field = wtforms.StringField("Errata filtering keywords",
-                                    validators=_wvrts,
-                                    default=_kwds_default)
-    keywords = wtforms.FieldList(_kw_field)
-
-    _rpms_default = ' '.join(fleure.globals.CORE_RPMS)
-    _rpm_field = wtforms.StringField("Core RPMs", validators=_wvrts,
-                                     default=_rpms_default)
-    core_rpms = wtforms.FieldList(_rpm_field)
+    keywords = StringField("Errata Filter Keywords",
+                           description="Keywords to select some Important "
+                                       "errata separated with comma ','.",
+                           validators=_wvrts,
+                           default=(", ".join(fleure.globals.ERRATA_KEYWORDS)))
+    core_rpms = StringField("Core RPMs",
+                            description="Special RPMs to foucs on",
+                            validators=_wvrts,
+                            default=(" ".join(fleure.globals.CORE_RPMS)))
 
     # TBD:
     # start_date = wtforms.DateTimeField("Start date", format="%Y-%m-%d")
-    # end_date = wtforms.StringField("End date", format="%Y-%m-%d")
+    # end_date = StringField("End date", format="%Y-%m-%d")
 
     submit = wtforms.SubmitField("Analyze")
 
