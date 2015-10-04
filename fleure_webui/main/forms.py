@@ -51,7 +51,7 @@ class FileAllowedEx(flask_wtf.file.FileAllowed):
             raise WV.StopValidation(self.message or message)
 
         if not self.upload_set.file_allowed(field.data, filename):
-            msg = self.message or 'File does not have an approved extension'
+            msg = self.message or "File does not have an approved extension"
             raise WV.StopValidation(msg)
 
 
@@ -93,27 +93,22 @@ class AnalyzeForm(flask_wtf.Form):
     #         ("rhel6", "RHEL 6"), ("rhel7", "RHEL 7")]
     # dist = wtforms.SelectField("OS Distribution", choices=dists,
     #                           default="auto")
-    _repos_desc = ("Yum repos to access. Only select some of them explicitly "
-                   "if you know needed yum repos clearly.")
+    _repos_desc = ("Yum repos to fetch errata info. Select some of them only "
+                   "if you sure about needed yum repos.")
     repos = wtforms.SelectMultipleField("Yum Repo[s]", description=_repos_desc,
                                         choices=_repo_choices())
-
-    _wvrts = [WV.Required(),
-              WV.Regexp(r"^(\w+(?:,?\s+\w+)*)$",
-                        message="Must consists of strings of letters "
-                                "(a-zA-Z0-9), separated with a comma (',')"
-                                "or space")]
-
-    keywords = StringField("Errata Filter Keywords",
-                           description="Keywords to select some Important "
-                                       "errata separated with comma ','.",
-                           validators=_wvrts,
+    _vldtrs = [WV.Required(),
+               WV.Regexp(r"^(\w+(?:,?\s+\w+)*)$",
+                         message="Must consists of strings of letters "
+                                 "(a-zA-Z0-9), separated with a comma (',')"
+                                 "and/or space")]
+    keywords = StringField("Errata Keywords", validators=_vldtrs,
+                           description="Keywords separated with comma ',' to "
+                                       "select some important errata.",
                            default=(", ".join(fleure.globals.ERRATA_KEYWORDS)))
-    core_rpms = StringField("Core RPMs",
+    core_rpms = StringField("Core RPMs", validators=_vldtrs,
                             description="Special RPMs to foucs on",
-                            validators=_wvrts,
                             default=(" ".join(fleure.globals.CORE_RPMS)))
-
     # TBD:
     # start_date = wtforms.DateTimeField("Start date", format="%Y-%m-%d")
     # end_date = StringField("End date", format="%Y-%m-%d")
