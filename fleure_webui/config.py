@@ -10,17 +10,15 @@ import os
 import uuid
 
 
-basedir = os.path.abspath(os.path.dirname(__file__))
-
-
 class Config(object):
     """Default configuration
     """
     SECRET_KEY = os.environ.get('SECRET_KEY') or str(uuid.uuid4())
     WTF_CSRF_ENABLED = True
 
-    FLEURE_UPLOAD_FOLDER = "/tmp/uploads"
-    FLEURE_WORKDIR = "/tmp/uploads"
+    _pkgcachedir = "/var/cache/fleure_webui"
+    UPLOADDIR = os.environ.get("FLEURE_UPLOADDIR", _pkgcachedir + "uploads")
+    WORKDIR = os.environ.get("FLEURE_WORKDIR", _pkgcachedir + "workdir")
 
     @staticmethod
     def init_app(app):
