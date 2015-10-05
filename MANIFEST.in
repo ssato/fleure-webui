@@ -2,4 +2,5 @@ include MANIFEST.in
 include README.rst
 include *.py
 include pkg/*
+include data/*/*
 recursive-include fleure_webui *.py *.html
