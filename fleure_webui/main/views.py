@@ -71,7 +71,7 @@ def upload():
         filename = werkzeug.secure_filename(form.filename.data.filename)
         filepath = _gen_filepath(filename)
 
-        uploaddir = flask.current_app.config["FLEURE_UPLOAD_FOLDER"]
+        uploaddir = flask.current_app.config["UPLOADDIR"]
         fileabspath = os.path.join(uploaddir, filepath)
         os.makedirs(os.path.dirname(fileabspath))
         form.filename.data.save(fileabspath)
@@ -102,7 +102,7 @@ def analyze():
     filepath = os.path.join(os.path.dirname(filepath), filename)
 
     # Convert to absolute path:
-    uploaddir = flask.current_app.config["FLEURE_UPLOAD_FOLDER"]
+    uploaddir = flask.current_app.config["UPLOADDIR"]
     filepath = os.path.join(uploaddir, filepath)
 
     form = AnalyzeForm()
@@ -110,7 +110,7 @@ def analyze():
     # form.repos.data.choices = [...]  # Select by dist.
 
     if form.validate_on_submit():
-        workdir = os.path.join(flask.current_app.config["FLEURE_WORKDIR"],
+        workdir = os.path.join(flask.current_app.config["WORKDIR"],
                                os.path.dirname(filepath))
 
         _kwds = _listify(form.keywords.data)
