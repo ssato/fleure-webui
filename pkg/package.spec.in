@@ -1,7 +1,12 @@
-# Ref. https://fedoraproject.org/wiki/Packaging:Python
+# :see: https://fedoraproject.org/wiki/Packaging:Python
+# :see: https://fedoraproject.org/wiki/Packaging:Guidelines#Web_Applications
+# :see: https://fedoraproject.org/wiki/Packaging:Web_Assets
 %global pkgname fleure-webui
 %global srcname fleure_webui
+%global pkgcachedir %{_localstatedir}/cache/fleure_webui
 %global sumtxt  Web UI frontend for fleure
+%global desc Web UI frontend for fleure, a package level static analysis tool \
+for RHEL and Fedora hosts.
 
 Name:           python-%{pkgname}
 Version:        @VERSION@
@@ -10,7 +15,6 @@ Summary:        %{sumtxt}
 Group:          Applications/System
 License:        AGPLv3+ and GPLv3+
 URL:            https://github.com/ssato/%{srcname}
-#Source0:        https://github.com/ssato/%{srcname}/tarball/master/%{name}-%{version}.tar.gz
 Source0:        %{srcname}-%{version}.tar.gz
 BuildArch:      noarch
 BuildRequires:  python2-devel python3-devel
@@ -19,32 +23,56 @@ BuildRequires:  python-setuptools python3-setuptools
 BuildRequires:  python2-tools python3-tools
 
 %description
-Fleure is a package level static analysis tool for systems running RPM-based
-linux distributions such like RHEL (primary target) and Fedora. And this
-package provides Web UI frontend for fleure.
+%{desc}
 
 %package     -n python2-%{pkgname}
 Summary:        %{sumtxt}
-Requires:       python-%{pkgname}-common
-# Available from: https://copr.fedoraproject.org/coprs/ssato/python-anyconfig/
 Requires:       python-fleure
+Requires:       python-%{pkgname}-common
 %{?python_provide:%python_provide python2-%{pkgname}}
 
 %description -n python2-%{pkgname}
-Fleure is a package level static analysis tool for systems running RPM-based
-linux distributions such like RHEL (primary target) and Fedora. And this
-package provides Web UI frontend for fleure.
+%{desc}
 
 %package     -n python3-%{pkgname}
 Summary:        %{sumtxt}
-Requires:       python-%{pkgname}-common
 Requires:       python3-fleure
+Requires:       python-%{pkgname}-common
 %{?python_provide:%python_provide python3-%{pkgname}}
 
 %description -n python3-%{pkgname}
-Fleure is a package level static analysis tool for systems running RPM-based
-linux distributions such like RHEL (primary target) and Fedora. And this
-package provides Web UI frontend for fleure.
+%{desc}
+
+This package provides python-3 support of %{pkgname}.
+
+%package     -n python-%{pkgname}-common
+Summary:        Common config and data files for %{pkgname}
+
+%description -n python-%{pkgname}-common
+%{desc}
+
+This package provides common config and data files for %{pkgname}.
+
+%package     -n python-%{pkgname}-httpd
+Summary:        Apache httpd config and data files for %{pkgname}
+Requires:       python-%{pkgname}
+Requires:       mod_wsgi
+
+%description -n python-%{pkgname}-httpd
+%{desc}
+
+This package provides Apache httpd config files for %{pkgname}.
+
+%package     -n python-%{pkgname}-nginx-uwsgi
+Summary:        Nginx and uWSGI config and data files for %{pkgname}
+Requires:       python-%{pkgname}
+Requires:       nginx
+Requires:       uwsgi
+
+%description -n python-%{pkgname}-nginx-uwsgi
+%{desc}
+
+This package provides nginx and uwsgi config files for %{pkgname}.
 
 %prep
 %setup -q -n %{srcname}-%{version}
@@ -56,6 +84,7 @@ package provides Web UI frontend for fleure.
 %install
 %py3_install
 %py2_install
+%{__mkdir_p} %{buildroot}/%{pkgcachedir}/{uploads,workdir}
 
 %files -n python2-%{pkgname}
 %doc README.rst
@@ -65,6 +94,16 @@ package provides Web UI frontend for fleure.
 %doc README.rst
 %{python3_sitelib}/*
 
+%files       -n python-%{pkgname}-common
+%dir %{pkgcachedir}/*
+%attr(0755,-,-) %{_libexecdir}/*.wsgi
+
+%files       -n python-%{pkgname}-httpd
+%{_sysconfdir}/httpd/conf.d/*.conf
+
+%files       -n python-%{pkgname}-nginx-uwsgi
+%{_sysconfdir}/nginx/default.d/fleure_webui.uwsgi.conf
+
 %changelog
-* Sun Sep 27 2015 Satoru SATOH <ssato@redhat.com> - 0.1-1
+* Mon Oct  5 2015 Satoru SATOH <ssato@redhat.com> - 0.1-1
 - Initial packaging
