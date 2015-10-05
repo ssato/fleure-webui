@@ -8,14 +8,14 @@ import flask
 import flask.ext.bootstrap
 import flask.ext.wtf.csrf
 
-import config
+from .config import CNF
 
 
 def create_app(cnf_name="development"):
     """
     :param cnf_name: Config name, e.g. "development"
     """
-    cnf = config.CNF[cnf_name]
+    cnf = CNF[cnf_name]
 
     app = flask.Flask(__name__)
     app.config.from_object(cnf)
