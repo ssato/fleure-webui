@@ -26,9 +26,9 @@ def list_files(tdir):
     return [f for f in glob(os.path.join(tdir, '*')) if os.path.isfile(f)]
 
 
-# TBD:
 data_files = [
-    # ...
+    ("/usr/libexec", ("data/wsgi/fleure_webui.wsgi", )),
+    ("/etc/httpd/conf.d", ("data/wsgi/fleure_webui.apache.conf", ))
 ]
 
 
@@ -74,10 +74,6 @@ class RpmCommand(SrpmCommand):
     build_stage = "b"
 
 
-TESTS_REQ = [l.rstrip() for l in open("pkg/test_requirements.txt").readlines()
-             if l and not l.startswith('#')]
-
-
 setup(name=PACKAGE,
       version=VERSION,
       description="Web UI frontend for fleure",
@@ -88,8 +84,7 @@ setup(name=PACKAGE,
       url="https://github.com/ssato/fleure-webui",
       packages=["fleure_webui"],
       include_package_data=True,
-      cmdclass={"srpm": SrpmCommand,
-                "rpm":  RpmCommand},
+      cmdclass=dict(srpm=SrpmCommand, rpm=RpmCommand),
       data_files=data_files)
 
 # vim:sw=4:ts=4:et:
