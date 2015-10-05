@@ -28,7 +28,8 @@ def list_files(tdir):
 
 data_files = [
     ("/usr/libexec", ("data/wsgi/fleure_webui.wsgi", )),
-    ("/etc/httpd/conf.d", ("data/wsgi/fleure_webui.apache.conf", ))
+    ("/etc/httpd/conf.d", list_files("data/apache/")),
+    ("/etc/nginx/default.d", list_files("data/nginx/")),
 ]
 
 
